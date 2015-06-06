@@ -1,0 +1,37 @@
+# (c) Copyright 2011-2014 Felipe Magno de Almeida
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import feature ;
+
+feature.feature ghtv-enable-gstreamer : on off : composite propagated link-incompatible ;
+feature.compose <ghtv-enable-gstreamer>off : <define>GHTV_DISABLE_GSTREAMER ;
+
+project directfb-player
+  : requirements <define>BOOST_NO_ALL_LIB=1
+  : default-build <link>static
+ ;
+
+exe directfb-player
+ : src/main.cpp /dfb//dfb
+   /gntl//gntl /libxml2//libxml2 /boost//filesystem #/<link>static
+   /gst//gst /gts//gts /simplest-dsmcc//simplest-dsmcc/<link>static
+   /boost//program_options #/<link>static
+ : <include>include <toolset>gcc:<cxxflags>-Wno-format #<toolset>gcc:<cxxflags>-fvisibility=hidden
+   <ghtv-enable-gstreamer>on:<source>src/video_sink.cpp <ghtv-enable-gstreamer>on:<source>/boost//thread
+   <ghtv-enable-gstreamer>on:<threading>multi
+ ;
+explicit directfb-player ;
+
+install install : directfb-player : <install-dependencies>on <install-type>EXE <install-type>SHARED_LIB ;
